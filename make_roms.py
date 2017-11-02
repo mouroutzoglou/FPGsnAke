@@ -1,6 +1,6 @@
 from PIL import Image
 from math import log2, ceil
-title = "brick_wall.png"
+title = "yellow_ball.png"
 dimensions = (32, 32)
 im = Image.open(title, "r")
 d = im.resize(dimensions)
@@ -13,16 +13,8 @@ output = """module """ + title.split(".")[0] + "_rom" + """(
         output reg [23:0] data
 	);
 	
-	reg [""" + str(ceil(log2(d.width)) - 1) + """:0] x_reg;
-	reg [""" + str(ceil(log2(d.height)) - 1) + """:0] y_reg;
-
-	always @(posedge clk) begin
-		x_reg <= x;
-		y_reg <= y;
-	end
-
 	always @ * begin
-	case ({y_reg, x_reg})\n"""
+	case ({y, x})\n"""
 
 for i in range(d.height):
         for j in range(d.width):

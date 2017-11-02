@@ -4,17 +4,9 @@ module image_rom_1(
         input wire [4:0] y,
         output reg [23:0] data
 	);
-	
-	reg [4:0] x_reg;
-	reg [4:0] y_reg;
-
-	always @(posedge clk) begin
-		x_reg <= x;
-		y_reg <= y;
-	end
 
 	always @ * begin
-	case ({y_reg, x_reg})
+	case ({y, x})
                 10'b0000000000: data = 24'b001110100010111000101110;
                 10'b0000000001: data = 24'b001110100010111000101110;
                 10'b0000000010: data = 24'b001110100010111000101110;
