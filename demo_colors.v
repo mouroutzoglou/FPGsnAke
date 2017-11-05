@@ -97,13 +97,10 @@ module demo_colors(
 					x_pos[5:0] <= x_pos[5:0] - 1;
 					direction <= 2'b01;
 				end
-<<<<<<< HEAD
-=======
 				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					en[score+1] <= 1'b1;
 					score <= score + 1;
 				end
->>>>>>> parent of 6d2d99c... failures gonna change plans
 			end else if(direction == 2'b01) begin
 				if(x_pos[5:0] > 0+1) begin
 					x_pos[5:0] <= x_pos[5:0] - 1;
@@ -112,13 +109,10 @@ module demo_colors(
 					x_pos[5:0] <= x_pos[5:0] + 1;
 					direction <= 2'b00;
 				end
-<<<<<<< HEAD
-=======
 				if(x_pos[0] - 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					en[score+1] <= 1'b1;
 					score <= score + 1;
 				end
->>>>>>> parent of 6d2d99c... failures gonna change plans
 			end else if(direction == 2'b11) begin
 				if(y_pos[5:0] < 22) begin
 					y_pos[5:0] <= y_pos[5:0] + 1;
@@ -127,13 +121,10 @@ module demo_colors(
 					y_pos[5:0] <= y_pos[5:0] - 1;
 					direction <= 2'b10;
 				end
-<<<<<<< HEAD
-=======
 				if(x_pos[0] == x_pos_a && y_pos[0] + 1 == y_pos_a) begin
 					en[score+1] <= 1'b1;
 					score <= score + 1;
 				end
->>>>>>> parent of 6d2d99c... failures gonna change plans
 			end else if(direction == 2'b10) begin
 				if(y_pos[5:0] > 0+1) begin
 					y_pos[5:0] <= y_pos[5:0] - 1;
@@ -142,13 +133,10 @@ module demo_colors(
 					y_pos[5:0] <= y_pos[5:0] + 1;
 					direction <= 2'b11;
 				end
-<<<<<<< HEAD
-=======
 				if(x_pos[0] == x_pos_a && y_pos[0] - 1 == y_pos_a) begin
 					en[score+1] <= 1'b1;
 					score <= score + 1;
 				end
->>>>>>> parent of 6d2d99c... failures gonna change plans
 			end
 		end else begin
 			cnt <= cnt + 1;
@@ -175,7 +163,6 @@ module demo_colors(
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-<<<<<<< HEAD
 		end else if(x_pos[5:0] == {1'b0, i_hcnt[9:5]} && y_pos[5:0] == i_vcnt[10:5] && score >= 0) begin
 			 o_r <= r_0;
 			 o_g <= g_0;
