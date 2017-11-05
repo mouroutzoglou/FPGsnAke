@@ -43,9 +43,12 @@ module demo_colors(
 	reg [59:0] x_pos;
 	reg [59:0] y_pos;
 	
+<<<<<<< HEAD
 	initial x_pos[5:0] <= 6'd16;
 	initial y_pos[5:0] <= 6'd22;
 	
+=======
+>>>>>>> parent of 6d2d99c... failures gonna change plans
 	reg en [0:483] = {1'b1, 483'b0};
 	reg [11:0] score = 12'd0;
 	
@@ -163,6 +166,7 @@ module demo_colors(
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
+<<<<<<< HEAD
 		end else if(x_pos[5:0] == {1'b0, i_hcnt[9:5]} && y_pos[5:0] == i_vcnt[10:5] && score >= 0) begin
 			 o_r <= r_0;
 			 o_g <= g_0;
@@ -201,6 +205,8 @@ module demo_colors(
 			 o_b <= b_0;
 		end else if(x_pos[59:54] == {1'b0, i_hcnt[9:5]} && y_pos[59:54] == i_vcnt[10:5] && score >= 9) begin
 =======
+=======
+>>>>>>> parent of 6d2d99c... failures gonna change plans
 		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && en[0] == 1'b1) begin
 			 o_r <= r_0;
 			 o_g <= g_0;
@@ -2134,6 +2140,9 @@ module demo_colors(
 			 o_g <= g_0;
 			 o_b <= b_0;
 		end else if(x_pos[483] == i_hcnt[10:5] && y_pos[483] == i_vcnt[10:5] && en[483] == 1'b1) begin
+<<<<<<< HEAD
+>>>>>>> parent of 6d2d99c... failures gonna change plans
+=======
 >>>>>>> parent of 6d2d99c... failures gonna change plans
 			 o_r <= r_0;
 			 o_g <= g_0;
