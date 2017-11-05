@@ -118,15 +118,13 @@ module demo_colors(
 				if(x_pos[0] == x_pos_a && y_pos[0] - 1 == y_pos_a) begin
 					score <= score + 1;
 				end
+			end			
+			for(i = 1; i <= 483; i = i + 1) begin
+			  x_pos[i] <= x_pos[i-1];
+			  y_pos[i] <= y_pos[i-1];
 			end
 		end else begin
 			cnt <= cnt + 1;
-			x_pos[0] <= x_pos[0];
-		   y_pos[0] <= y_pos[0];
-		end			
-		for(i = 1; i <= 483; i = i + 1) begin
-		  x_pos[i] <= x_pos[i-1];
-		  y_pos[i] <= y_pos[i-1];
 		end
 	end
 	
