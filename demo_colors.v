@@ -31,7 +31,7 @@ module demo_colors(
 	wire [5:0] y_dim = 6'd32;	
 	
 	
-	reg [1:0] direction = 2'b00; //00 right
+	reg [1:0] direction = 2'b10; //00 right
 										  //01 left
 										  //10 up
 										  //11 down
@@ -40,8 +40,9 @@ module demo_colors(
 	wire [7:0] g_0;
 	wire [7:0] b_0;
 	
-	reg [11:0] x_pos_0 = 12'd128;
-	reg [11:0] y_pos_0 = 12'd256;
+	reg [11:0] x_pos_0 = 12'd512;
+	reg [11:0] y_pos_0 = 12'd704;
+	wire en_0 = 1'b1;
 	
 	reg [11:0] x_pos_1 = 12'd0;
 	reg [11:0] y_pos_1 = 12'd0;
@@ -78,8 +79,8 @@ module demo_colors(
 	wire [7:0] g_a;
 	wire [7:0] b_a;
 	
-	reg [11:0] x_pos_a = 12'd512;
-	reg [11:0] y_pos_a = 12'd512;
+	reg [11:0] x_pos_a = 32 * 16;
+	reg [11:0] y_pos_a = 32 * 8;
 	
 	wire [11:0] x_a = i_hcnt - x_pos_a;
 	wire [11:0] y_a = i_vcnt - y_pos_a;
@@ -87,39 +88,59 @@ module demo_colors(
 	image_rom_2 rom_2 (i_clk_74M, x_a[4:0], y_a[4:0], {r_a, g_a, b_a});	
 	
 	
-	reg [26:0] cnt = 27'b0;
+	reg [26:0] cnt = 27'd1;
 	
 	always @ (posedge i_clk_74M) begin
 		if(cnt == 27'd65000000) begin
-			cnt <= 0;
+			cnt <= 1;
 			if(direction == 2'b00) begin
 				if(x_pos_0 < 768-64) begin
 					x_pos_0 <= x_pos_0 + 32;
+					direction <= 2'b00;
 				end else begin
-					x_pos_0 <= 0+32;
+					x_pos_0 <= x_pos_0 - 32;
+					direction <= 2'b01;
 				end
-				direction <= 2'b11;
+				if(x_pos_0 + 32 == x_pos_a && y_pos_0 == y_pos_a) begin
+					en_1 <= en_0;
+					en_2 <= en_1;
+				end
 			end else if(direction == 2'b01) begin
 				if(x_pos_0 > 0+32) begin
 					x_pos_0 <= x_pos_0 - 12'd32;
+					direction <= 2'b01;
 				end else begin
-					x_pos_0 <= 768-64;
+					x_pos_0 <= x_pos_0 + 12'd32;
+					direction <= 2'b00;
 				end
-				direction <= 2'b10;
+				if(x_pos_0 - 32 == x_pos_a && y_pos_0 == y_pos_a) begin
+					en_1 <= en_0;
+					en_2 <= en_1;
+				end
 			end else if(direction == 2'b11) begin
 				if(y_pos_0 < 768-64) begin
 					y_pos_0 <= y_pos_0 + 32;
+					direction <= 2'b11;
 				end else begin
-					y_pos_0 <= 0+32;
+					y_pos_0 <= y_pos_0 - 32;
+					direction <= 2'b10;
 				end
-				direction <= 2'b01;
+				if(x_pos_0 == x_pos_a && y_pos_0 + 32 == y_pos_a) begin
+					en_1 <= en_0;
+					en_2 <= en_1;
+				end
 			end else if(direction == 2'b10) begin
 				if(y_pos_0 > 0+32) begin
 					y_pos_0 <= y_pos_0 - 12'd32;
+					direction <= 2'b10;
 				end else begin
-					y_pos_0 <= 768-64;
+					y_pos_0 <= y_pos_0 + 32;
+					direction <= 2'b11;
 				end
-				direction <= 2'b00;
+				if(x_pos_0 == x_pos_a && y_pos_0 - 32 == y_pos_a) begin
+					en_1 <= en_0;
+					en_2 <= en_1;
+				end
 			end
 			x_pos_1 <= x_pos_0;
 			x_pos_2 <= x_pos_1;
@@ -137,12 +158,11 @@ module demo_colors(
 	end
 	
 	always @ (posedge i_clk_74M) begin
-		//if(x_1 >= 0 && x_1 < x_dim && y_1 >= 0 && y_1 < y_dim ) begin
 		if(x_b >= 0 && x_b < 768 && y_b >= 0 && y_b < y_dim ) begin
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-		end else if(x_b >= 0 && x_b < 768 && y_b >= 764-32 && y_b < 768 ) begin
+		end else if(x_b >= 0 && x_b < 768 && y_b >= 768-32 && y_b < 768 ) begin
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
