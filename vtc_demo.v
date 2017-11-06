@@ -55,6 +55,7 @@ module vtc_demo (
   input  wire SYS_CLK,
 
   input  wire [3:0] SW,
+  input  wire [4:0] BTN,
   
   output wire [3:0] TMDS,
   output wire [3:0] TMDSB,
@@ -113,7 +114,7 @@ module vtc_demo (
 
   synchro #(.INITIALIZE("LOGIC0"))
   synchro_sws_0 (.async(SW[0]),.sync(sws_sync[0]),.clk(clk50m_bufg));
-
+  
   reg [3:0] sws_sync_q;
   always @ (posedge clk50m_bufg)
   begin
@@ -531,10 +532,54 @@ module vtc_demo (
 
   assign {red_data, green_data, blue_data} = active_pixel;
 `else
+
+  wire btn0_rdy, btn1_rdy, btn2_rdy, btn3_rdy, btn4_rdy;
+  
+  
+    debounce debbtn0 (
+    .clk(pclk),
+	 .d(BTN[0]),
+	 .qp(btn0_rdy),
+	 .qr(),
+	 .qs());	 
+  
+  debounce debbtn1 (
+    .clk(pclk),
+	 .d(BTN[1]),
+	 .qp(btn1_rdy),
+	 .qr(),
+	 .qs());	  
+  
+  debounce debbtn2 (
+    .clk(pclk),
+	 .d(BTN[2]),
+	 .qp(btn2_rdy),
+	 .qr(),
+	 .qs());	 	 
+  
+  debounce debbtn3 (
+    .clk(pclk),
+	 .d(BTN[3]),
+	 .qp(btn3_rdy),
+	 .qr(),
+	 .qs());	 	 
+  
+  debounce debbtn4 (
+    .clk(pclk),
+	 .d(BTN[4]),
+	 .qp(btn4_rdy),
+	 .qr(),
+	 .qs());	 
+	 
   demo_colors clrs(
     .i_clk_74M(pclk),
     .i_hcnt(bgnd_hcount),
     .i_vcnt(bgnd_vcount),
+	 .r_btn(btn0_rdy), 
+	 .l_btn(btn1_rdy), 
+	 .d_btn(btn2_rdy), 
+	 .u_btn(btn3_rdy), 
+	 .c_btn(btn4_rdy),
     .o_r(red_data),
     .o_g(green_data),
     .o_b(blue_data)

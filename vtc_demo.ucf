@@ -135,6 +135,12 @@ NET "TMDSB(2)"  LOC = "A8" | IOSTANDARD = TMDS_33 ;
 NET "TMDS(3)"  	LOC = "B6" | IOSTANDARD = TMDS_33 ; # Clock
 NET "TMDSB(3)"  LOC = "A6" | IOSTANDARD = TMDS_33 ;
 
+NET "BTN<0>"         LOC = "F6" | IOSTANDARD = LVCMOS33 ; #Right
+NET "BTN<1>"         LOC = "P4" | IOSTANDARD = LVCMOS33 ; #Left
+NET "BTN<2>"         LOC = "P3" | IOSTANDARD = LVCMOS33 ; #Down
+NET "BTN<3>"         LOC = "N4" | IOSTANDARD = LVCMOS33 ; #Up
+NET "BTN<4>"         LOC = "F5" | IOSTANDARD = LVCMOS33 ; #Center
+
 
 
 

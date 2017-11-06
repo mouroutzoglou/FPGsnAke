@@ -42,3 +42,5 @@ _impact.log
 *.ngm
 *.sdbl
 *.sdbx
+*.nlf
+netgen/synthesis/vtc_demo_synthesis.v
