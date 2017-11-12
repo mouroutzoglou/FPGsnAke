@@ -18,94 +18,92 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module demo_colors(
-	input            i_clk_74M, //65 MHZ pixel clock
+module snake(
+	input            i_clk_74M, //25 MHZ pixel clock
 	input [11:0]     i_vcnt, //vertical counter from video timing generator
 	input [11:0]     i_hcnt, //horizontal counter from video timing generator
 	
-	input r_btn, 
-	input l_btn, 
-	input d_btn, 
-	input u_btn, 
-	input c_btn,
+	input r_btn, //right input
+	input l_btn, //left input
+	input d_btn, //down input
+	input u_btn, //up input
+	input c_btn, //center input
 
-	output reg[7:0]  o_r,
-	output reg[7:0]  o_g,
-	output reg[7:0]  o_b
+	output reg[7:0]  o_r, //red output
+	output reg[7:0]  o_g, //green output
+	output reg[7:0]  o_b // blue output
 );		
-	wire [5:0] x_dim = 6'd32;
-	wire [5:0] y_dim = 6'd32;	
 	
-	
-	reg [1:0] direction = 2'b00; //00 right
+	reg [1:0] direction = 2'b00; //the direction of the snake
+										  //00 right
 										  //01 left
 										  //10 up
 										  //11 down
 										  			  
 	always @(posedge i_clk_74M) begin	
-		if(r_btn == 1'b1 && direction[1] == 1'b1) begin
-			direction <= 2'b00;
-		end else if(l_btn == 1'b1 && direction[1] == 1'b1) begin
-			direction <= 2'b01;
-		end else if(d_btn == 1'b1 && direction[1] == 1'b0) begin
-			direction <= 2'b11;
-		end else if(u_btn == 1'b1 && direction[1] == 1'b0) begin
-			direction <= 2'b10;
-		end else if(c_btn == 1'b1) begin
-			direction <= direction;
+		if(r_btn == 1'b1 && direction[1] == 1'b1) begin //if we press right and we are moving up or down
+			direction <= 2'b00; //then turn right
+		end else if(l_btn == 1'b1 && direction[1] == 1'b1) begin //if we press left and we are moving up or down
+			direction <= 2'b01; //then turn left
+		end else if(d_btn == 1'b1 && direction[1] == 1'b0) begin //if we press down and we are moving right or left
+			direction <= 2'b11; //then turn down
+		end else if(u_btn == 1'b1 && direction[1] == 1'b0) begin //if we press up and we are moving right or left
+			direction <= 2'b10; //then turn up
+		end else if(c_btn == 1'b1) begin //middle button has no usage as of now
+			direction <= direction; //keep the direction
 		end else begin
 			direction <= direction;
 		end			
 	end
 	
-	wire [7:0] r_0;
+	wire [7:0] r_0; //three 8 bit wires (r, g, b) for the data of the first image which is the apple image
 	wire [7:0] g_0;
 	wire [7:0] b_0;
 	
-	reg [5:0] x_pos [0:168] = {6'd2, 1008'b0};
-	reg [5:0] y_pos [0:168] = {6'd12, 1008'b0};
+	reg [5:0] x_pos [0:168] = {6'd2, 1008'b0}; //a memory storing all the possible x positions of the snake
+	reg [5:0] y_pos [0:168] = {6'd12, 1008'b0}; //a memory storing all the possible y positions of the snake
 	
-	reg [11:0] score = 12'd0;
+	reg [11:0] score = 12'd0; //a score register, that also enables us to increase the size of our snake
 	
-	image_rom_0 rom_0 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_0, g_0, b_0});	
+	image_rom_0 rom_0 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_0, g_0, b_0});	//the rom containing the image of the snake body
 
 
-	wire [7:0] r_b;
+	wire [7:0] r_b; //(r, g, b) wires for the brick wall
 	wire [7:0] g_b;
 	wire [7:0] b_b;
 	
-	reg [5:0] x_pos_b = 6'd0;
+	reg [5:0] x_pos_b = 6'd0; //starting position of the brick wall
 	reg [5:0] y_pos_b = 6'd0;
 	
-	image_rom_1 rom_1 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_b, g_b, b_b});	
+	image_rom_1 rom_1 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_b, g_b, b_b});	//image rom for the brick wall
 	
 		
-	wire [7:0] r_a;
+	wire [7:0] r_a; //(r, g, b) for the apple
 	wire [7:0] g_a;
 	wire [7:0] b_a;
 	
-	reg [5:0] x_pos_a = 6'd10;
+	reg [5:0] x_pos_a = 6'd10; //position of the apple
 	reg [5:0] y_pos_a = 6'd10;
 
-	image_rom_2 rom_2 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_a, g_a, b_a});	
+	image_rom_2 rom_2 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_a, g_a, b_a});	 //image rom for the apple
 	
 	
-	reg [26:0] cnt = 27'd1;
-	reg [9:0] i;
+	reg [24:0] cnt = 25'd1; //counting cycles to move once per 25million cycles equal to one second.
+	reg [9:0] i; //used in the for loops
 	
 	always @ (posedge i_clk_74M) begin
-		if(cnt == 27'd25000000) begin
+		if(cnt == 25'd25000000) begin //once every 25million cycles
 			cnt <= 1;
-			if(direction == 2'b00) begin
-				if(x_pos[0] < 13) begin
-					x_pos[0] <= x_pos[0] + 1;
+			if(direction == 2'b00) begin //if we are moving right
+				if(x_pos[0] < 13) begin //and we are not going out of bounds
+					x_pos[0] <= x_pos[0] + 1; // move to the right
 				end else begin
-					x_pos[0] <= 1;
+					x_pos[0] <= 1; //else cycle around
 				end
-				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin
+				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin //if the position we are going to move to is occupied by an apple increase our score
 					score <= score + 1;
 				end
-			end else if(direction == 2'b01) begin
+			end else if(direction == 2'b01) begin //same logic as above for left movement
 				if(x_pos[0] > 1) begin
 					x_pos[0] <= x_pos[0] - 1;
 				end else begin
@@ -114,7 +112,7 @@ module demo_colors(
 				if(x_pos[0] - 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					score <= score + 1;
 				end
-			end else if(direction == 2'b11) begin
+			end else if(direction == 2'b11) begin //same logic as above for down movement
 				if(y_pos[0] < 13) begin
 					y_pos[0] <= y_pos[0] + 1;
 				end else begin
@@ -123,7 +121,7 @@ module demo_colors(
 				if(x_pos[0] == x_pos_a && y_pos[0] + 1 == y_pos_a) begin
 					score <= score + 1;
 				end
-			end else if(direction == 2'b10) begin
+			end else if(direction == 2'b10) begin //same logic as above for up movement
 				if(y_pos[0] > 1) begin
 					y_pos[0] <= y_pos[0] - 1;
 				end else begin
@@ -133,34 +131,34 @@ module demo_colors(
 					score <= score + 1;
 				end
 			end			
-			for(i = 1; i <= 168; i = i + 1) begin
+			for(i = 1; i <= 168; i = i + 1) begin //pass the movement to the lower parts of the body.
 			  x_pos[i] <= x_pos[i-1];
 			  y_pos[i] <= y_pos[i-1];
 			end
 		end else begin
-			cnt <= cnt + 1;
+			cnt <= cnt + 1; //count cycles
 		end
 	end
 	
 	always @ (posedge i_clk_74M) begin	
 		
-		if(x_pos_b <= i_hcnt[10:5] && x_pos_b + 6'd15 > i_hcnt[10:5] && y_pos_b == i_vcnt[10:5]) begin
+		if(x_pos_b <= i_hcnt[10:5] && x_pos_b + 6'd15 > i_hcnt[10:5] && y_pos_b == i_vcnt[10:5]) begin //if drawing top border return brick wall image
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-		end else if(x_pos_b <= i_hcnt[10:5] && x_pos_b + 6'd15 > i_hcnt[10:5] && y_pos_b == i_vcnt[10:5] - 6'd14) begin
+		end else if(x_pos_b <= i_hcnt[10:5] && x_pos_b + 6'd15 > i_hcnt[10:5] && y_pos_b == i_vcnt[10:5] - 6'd14) begin //if drawing bottom border return brick wall image
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-		end else if(y_pos_b <= i_vcnt[10:5] && y_pos_b + 6'd15 > i_vcnt[10:5] && x_pos_b == i_hcnt[10:5]) begin
+		end else if(y_pos_b <= i_vcnt[10:5] && y_pos_b + 6'd15 > i_vcnt[10:5] && x_pos_b == i_hcnt[10:5]) begin //if drawing left border return brick wall image
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-		end else if(y_pos_b <= i_vcnt[10:5] && y_pos_b + 6'd15 > i_vcnt[10:5] && x_pos_b == i_hcnt[10:5] - 6'd14) begin
+		end else if(y_pos_b <= i_vcnt[10:5] && y_pos_b + 6'd15 > i_vcnt[10:5] && x_pos_b == i_hcnt[10:5] - 6'd14) begin //if drawing right border return brick wall image
 			o_r <= r_b;
 			o_g <= g_b;
 			o_b <= b_b;
-		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && score >= 0) begin
+		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && score >= 0) begin //big else if statement to check all the snake parts to draw them. Go to the bottom for the apple.
 			 o_r <= r_0;
 			 o_g <= g_0;
 			 o_b <= b_0;
@@ -836,11 +834,11 @@ module demo_colors(
 			 o_r <= r_0;
 			 o_g <= g_0;
 			 o_b <= b_0;
-		end else if(x_pos_a == i_hcnt[10:5] && y_pos_a == i_vcnt[10:5]) begin
+		end else if(x_pos_a == i_hcnt[10:5] && y_pos_a == i_vcnt[10:5]) begin //Finally check if its the apple's time to get drawn.
 			o_r <= r_a;
 			o_g <= g_a;
 			o_b <= b_a;
-		end else begin
+		end else begin // if there is nothing to draw return black color.
 			o_r <= 8'b0;
 			o_g <= 8'b0;
 			o_b <= 8'b0;

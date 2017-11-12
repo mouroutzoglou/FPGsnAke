@@ -46,10 +46,11 @@
 // Copyright (c) 2009 Xilinx, Inc.
 // This design is confidential and proprietary of Xilinx, All Rights Reserved.
 //////////////////////////////////////////////////////////////////////////////
-
+//!!!!!!!!!!!!!!!!!!!!!!!!!!My code starts at line 540!!!!!!!!!!!!!!!!!!!!!!//
+//////////////////////////////////////////////////////////////////////////////
 `timescale 1 ps / 1 ps
 
-module vtc_demo (
+module top_level (
   input  wire RSTBTN,
 
   input  wire SYS_CLK,
@@ -536,7 +537,7 @@ module vtc_demo (
   wire btn0_rdy, btn1_rdy, btn2_rdy, btn3_rdy, btn4_rdy;
   
   
-    debounce debbtn0 (
+    debounce debbtn0 ( //debouncing the inputs
     .clk(pclk),
 	 .d(BTN[0]),
 	 .qp(btn0_rdy),
@@ -571,7 +572,7 @@ module vtc_demo (
 	 .qr(),
 	 .qs());	 
 	 
-  demo_colors clrs(
+  snake snk( //initializing the module
     .i_clk_74M(pclk),
     .i_hcnt(bgnd_hcount),
     .i_vcnt(bgnd_vcount),
