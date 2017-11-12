@@ -162,11 +162,11 @@ module snake(
 			 o_r <= r_0;
 			 o_g <= g_0;
 			 o_b <= b_0;
-		end else if(x_pos[1] == i_hcnt[10:5] && y_pos[1] == i_vcnt[10:5] && score >= 1) begin
+		end else if(x_pos[1] == i_hcnt[10:5] && y_pos[1] == i_vcnt[10:5] && score >= 1) begin //we only check the snake parts that have position lower or equal than the score.
 			 o_r <= r_0;
 			 o_g <= g_0;
 			 o_b <= b_0;
-		end else if(x_pos[2] == i_hcnt[10:5] && y_pos[2] == i_vcnt[10:5] && score >= 2) begin
+		end else if(x_pos[2] == i_hcnt[10:5] && y_pos[2] == i_vcnt[10:5] && score >= 2) begin //score == size of the snake.
 			 o_r <= r_0;
 			 o_g <= g_0;
 			 o_b <= b_0;
