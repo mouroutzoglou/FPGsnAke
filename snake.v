@@ -87,6 +87,7 @@ module snake(
 
 	image_rom_2 rom_2 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_a, g_a, b_a});	 //image rom for the apple
 	
+	reg bitten = 1'b0; //flag to check if bitten
 	
 	reg [24:0] cnt = 25'd1; //counting cycles to move once per 25million cycles equal to one second.
 	reg [9:0] i; //used in the for loops
@@ -94,6 +95,7 @@ module snake(
 	always @ (posedge i_clk_74M) begin
 		if(cnt == 25'd25000000) begin //once every 25million cycles
 			cnt <= 1;
+			bitten <= 1'b0; //reset bitten flag every time the snake moves. this will get removed later
 			if(direction == 2'b00) begin //if we are moving right
 				if(x_pos[0] < 13) begin //and we are not going out of bounds
 					x_pos[0] <= x_pos[0] + 1; // move to the right
@@ -136,6 +138,11 @@ module snake(
 			  y_pos[i] <= y_pos[i-1];
 			end
 		end else begin
+			if(cnt <= 25'd168 && cnt >= 25'd1 && bitten == 1'b0) begin //the first 168 cycles we check if it bit itself
+				if(score >= cnt[11:0] && x_pos[0] == x_pos[cnt] && y_pos[0] == y_pos[cnt]) begin //check a different part in each cycle
+					bitten <= 1'b1; //it bit itself
+				end
+			end
 			cnt <= cnt + 1; //count cycles
 		end
 	end
@@ -159,9 +166,15 @@ module snake(
 			o_g <= g_b;
 			o_b <= b_b;
 		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && score >= 0) begin //big else if statement to check all the snake parts to draw them. Go to the bottom for the apple.
-			 o_r <= r_0;
-			 o_g <= g_0;
-			 o_b <= b_0;
+			if(bitten == 1'b0) begin
+				 o_r <= r_0;
+				 o_g <= g_0;
+				 o_b <= b_0;
+			end else begin
+				 o_r <= g_0;
+				 o_g <= b_0;
+				 o_b <= r_0;
+			end
 		end else if(x_pos[1] == i_hcnt[10:5] && y_pos[1] == i_vcnt[10:5] && score >= 1) begin //we only check the snake parts that have position lower or equal than the score.
 			 o_r <= r_0;
 			 o_g <= g_0;
