@@ -92,6 +92,69 @@ module snake(
 	reg [24:0] cnt = 25'd1; //counting cycles to move once per 25million cycles equal to one second.
 	reg [9:0] i; //used in the for loops
 	
+	wire [15:0] rng;
+	PRNG prng_gen (i_clk_74M, rng);
+	
+	reg [5:0] new_x_a = 6'd1;
+	reg [5:0] new_y_a = 6'd1;
+	
+	reg [5:0] temp_x_a = 6'd1;
+	reg [5:0] temp_y_a = 6'd1;
+	
+	reg [11:0] s_pos_cnt = 12'd0;
+	reg [11:0] c_cnt = 12'd0;
+	
+	reg available = 1'b1;
+	
+	reg [8:0] M = 9'd1;
+	
+	wire [15:0] threshold;
+	divisions_lut divider (M, threshold);
+	
+	always @ (posedge i_clk_74M) begin
+//		
+//		if(c_cnt == 12'd168) begin
+//			c_cnt <= 12'd0;
+//			available <= 1'b1;
+//			temp_x_a <= 6'd1;
+//			temp_y_a <= 6'd1;
+//			if(available == 1'b1 && rng <= threshold) begin
+//				M <= M + 9'd1;
+//				new_x_a <= temp_x_a;
+//				new_y_a <= temp_y_a;
+//			end
+//		end else begin
+//			c_cnt <= c_cnt + 12'd1;
+//		end
+//
+		if((x_pos[c_cnt] == temp_x_a || y_pos[c_cnt] == temp_y_a) && score >= c_cnt) begin
+			available <= 1'b0;
+		end
+		if(temp_x_a == 6'd13) begin
+			temp_x_a <= 6'd1;
+			if(temp_y_a == 6'd13) begin
+				if(c_cnt == 12'd168) begin
+					c_cnt <= 12'd0;
+					M <= 9'd1;
+				end else begin
+					c_cnt <= c_cnt + 12'd1;
+				end
+				temp_y_a <= 6'd1;
+				available <= 1'b1;			
+				if(available == 1'b1 && rng <= threshold) begin
+					M <= M + 9'd1;
+					new_x_a <= temp_x_a;
+					new_y_a <= temp_y_a;
+				end
+			end else begin
+				temp_y_a <= temp_y_a + 6'd1;
+			end
+		end else begin
+			temp_x_a <= temp_x_a + 6'd1;
+		end
+		
+	end
+	
 	always @ (posedge i_clk_74M) begin
 		if(cnt == 25'd25000000) begin //once every 25million cycles
 			cnt <= 1;
@@ -104,6 +167,8 @@ module snake(
 				end
 				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin //if the position we are going to move to is occupied by an apple increase our score
 					score <= score + 1;
+					x_pos_a <= rng[5:0];//new_x_a;
+					y_pos_a <= rng[11:6];//new_y_a;
 				end
 			end else if(direction == 2'b01) begin //same logic as above for left movement
 				if(x_pos[0] > 1) begin
@@ -113,6 +178,8 @@ module snake(
 				end
 				if(x_pos[0] - 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					score <= score + 1;
+					x_pos_a <= rng[5:0];//new_x_a;
+					y_pos_a <= rng[11:6];//new_y_a;
 				end
 			end else if(direction == 2'b11) begin //same logic as above for down movement
 				if(y_pos[0] < 13) begin
@@ -122,6 +189,8 @@ module snake(
 				end
 				if(x_pos[0] == x_pos_a && y_pos[0] + 1 == y_pos_a) begin
 					score <= score + 1;
+					x_pos_a <= rng[5:0];//new_x_a;
+					y_pos_a <= rng[11:6];//new_y_a;
 				end
 			end else if(direction == 2'b10) begin //same logic as above for up movement
 				if(y_pos[0] > 1) begin
@@ -131,6 +200,8 @@ module snake(
 				end
 				if(x_pos[0] == x_pos_a && y_pos[0] - 1 == y_pos_a) begin
 					score <= score + 1;
+					x_pos_a <= rng[5:0];//new_x_a;
+					y_pos_a <= rng[11:6];//new_y_a;
 				end
 			end			
 			for(i = 1; i <= 168; i = i + 1) begin //pass the movement to the lower parts of the body.
