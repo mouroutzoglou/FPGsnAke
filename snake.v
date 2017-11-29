@@ -167,8 +167,8 @@ module snake(
 				end
 				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin //if the position we are going to move to is occupied by an apple increase our score
 					score <= score + 1;
-					x_pos_a <= rng[5:0];//new_x_a;
-					y_pos_a <= rng[11:6];//new_y_a;
+					x_pos_a <= new_x_a;
+					y_pos_a <= new_y_a;
 				end
 			end else if(direction == 2'b01) begin //same logic as above for left movement
 				if(x_pos[0] > 1) begin
@@ -178,8 +178,8 @@ module snake(
 				end
 				if(x_pos[0] - 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					score <= score + 1;
-					x_pos_a <= rng[5:0];//new_x_a;
-					y_pos_a <= rng[11:6];//new_y_a;
+					x_pos_a <= new_x_a;
+					y_pos_a <= new_y_a;
 				end
 			end else if(direction == 2'b11) begin //same logic as above for down movement
 				if(y_pos[0] < 13) begin
@@ -189,8 +189,8 @@ module snake(
 				end
 				if(x_pos[0] == x_pos_a && y_pos[0] + 1 == y_pos_a) begin
 					score <= score + 1;
-					x_pos_a <= rng[5:0];//new_x_a;
-					y_pos_a <= rng[11:6];//new_y_a;
+					x_pos_a <= new_x_a;
+					y_pos_a <= new_y_a;
 				end
 			end else if(direction == 2'b10) begin //same logic as above for up movement
 				if(y_pos[0] > 1) begin
@@ -200,8 +200,8 @@ module snake(
 				end
 				if(x_pos[0] == x_pos_a && y_pos[0] - 1 == y_pos_a) begin
 					score <= score + 1;
-					x_pos_a <= rng[5:0];//new_x_a;
-					y_pos_a <= rng[11:6];//new_y_a;
+					x_pos_a <= new_x_a;
+					y_pos_a <= new_y_a;
 				end
 			end			
 			for(i = 1; i <= 168; i = i + 1) begin //pass the movement to the lower parts of the body.
