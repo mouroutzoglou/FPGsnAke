@@ -70,3 +70,13 @@ prng_test_isim_beh.exe
 prng_test_isim_beh.wdb
 ten_bit_PRNG.v
 xilinxsim.ini
+*.exe
+*.wdb
+*.dbg
+*.dll
+*.dat
+isim/bin2bcd_test_isim_beh.exe.sim/tmp_save/_1
+*.c
+*.obj
+*.didat
+*.sdb

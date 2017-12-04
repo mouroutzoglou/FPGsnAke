@@ -1,6 +1,6 @@
 from PIL import Image
 from math import log2, ceil
-title = "yellow_ball.png"
+title = "_9.png"
 dimensions = (32, 32)
 im = Image.open(title, "r")
 d = im.resize(dimensions)
