@@ -60,13 +60,58 @@ module snake(
 	wire [7:0] g_s;
 	wire [7:0] b_s;
 	
+	image_rom_0 rom_0 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s, g_s, b_s});	//the rom containing the image of the snake body
+	
 	reg [5:0] x_pos [0:168] = {6'd2, 1008'b0}; //a memory storing all the possible x positions of the snake
 	reg [5:0] y_pos [0:168] = {6'd12, 1008'b0}; //a memory storing all the possible y positions of the snake
 	
 	reg [11:0] score = 12'd0; //a score register, that also enables us to increase the size of our snake
 	
-	image_rom_0 rom_0 (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s, g_s, b_s});	//the rom containing the image of the snake body
-
+	wire [7:0] r_s_h_d;
+	wire [7:0] g_s_h_d;
+	wire [7:0] b_s_h_d;
+		
+	wire [7:0] r_s_h_l;
+	wire [7:0] g_s_h_l;
+	wire [7:0] b_s_h_l;
+		
+	wire [7:0] r_s_h_r;
+	wire [7:0] g_s_h_r;
+	wire [7:0] b_s_h_r;
+		
+	wire [7:0] r_s_h_u;
+	wire [7:0] g_s_h_u;
+	wire [7:0] b_s_h_u;
+	
+	s_h_d_rom s_h_d (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_d, g_s_h_d, b_s_h_d});	//the rom containing the image of the snake head looking down
+	s_h_l_rom s_h_l (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_l, g_s_h_l, b_s_h_l});	//the rom containing the image of the snake head looking left
+	s_h_r_rom s_h_r (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_r, g_s_h_r, b_s_h_r});	//the rom containing the image of the snake head looking right
+	s_h_u_rom s_h_u (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_u, g_s_h_u, b_s_h_u});	//the rom containing the image of the snake head looking up
+	
+	reg [7:0] r_s_h;
+	reg [7:0] g_s_h;
+	reg [7:0] b_s_h;
+	
+	always @ (direction) begin
+		if(direction == 2'b00) begin
+			r_s_h <= r_s_h_r;
+			g_s_h <= g_s_h_r;
+			b_s_h	<= b_s_h_r;
+		end else if(direction == 2'b01) begin
+			r_s_h <= r_s_h_l;
+			g_s_h <= g_s_h_l;
+			b_s_h	<= b_s_h_l;
+		end else if(direction == 2'b11) begin
+			r_s_h <= r_s_h_d;
+			g_s_h <= g_s_h_d;
+			b_s_h	<= b_s_h_d;
+		end else begin
+			r_s_h <= r_s_h_u;
+			g_s_h <= g_s_h_u;
+			b_s_h	<= b_s_h_u;
+		end
+	end
+	
 
 	wire [7:0] r_b; //(r, g, b) wires for the brick wall
 	wire [7:0] g_b;
@@ -431,13 +476,13 @@ module snake(
 			o_b <= b_b;
 		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && score >= 0) begin //big else if statement to check all the snake parts to draw them. Go to the bottom for the apple.
 			if(bitten == 1'b0) begin
-				 o_r <= r_s;
-				 o_g <= g_s;
-				 o_b <= b_s;
+				 o_r <= r_s_h;
+				 o_g <= g_s_h;
+				 o_b <= b_s_h;
 			end else begin
-				 o_r <= g_s;
-				 o_g <= b_s;
-				 o_b <= r_s;
+				 o_r <= g_s_h;
+				 o_g <= b_s_h;
+				 o_b <= r_s_h;
 			end
 		end else if(x_pos[1] == i_hcnt[10:5] && y_pos[1] == i_vcnt[10:5] && score >= 1) begin //we only check the snake parts that have position lower or equal than the score.
 			 o_r <= r_s;
