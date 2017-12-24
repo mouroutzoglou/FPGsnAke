@@ -25,7 +25,7 @@ module PRNG(
 
 	initial out = 16'b0;
 
-	always @ (posedge clk) begin
+	always @ (posedge clk) begin //16-bit LFSR. Performs a 2^16 state cycle.
 		out[0] <= ~(out[15] ^ out[14] ^ out[12] ^ out[3]);
 		out[1] <= out[0];
 		out[2] <= out[1];
