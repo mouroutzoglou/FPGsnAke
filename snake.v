@@ -67,19 +67,19 @@ module snake(
 	
 	reg [11:0] score = 12'd0; //a score register, that also enables us to increase the size of our snake
 	
-	wire [7:0] r_s_h_d;
+	wire [7:0] r_s_h_d;//rgb wires for head looking down
 	wire [7:0] g_s_h_d;
 	wire [7:0] b_s_h_d;
 		
-	wire [7:0] r_s_h_l;
+	wire [7:0] r_s_h_l;//rgb wires for head looking left
 	wire [7:0] g_s_h_l;
 	wire [7:0] b_s_h_l;
 		
-	wire [7:0] r_s_h_r;
+	wire [7:0] r_s_h_r;//rgb wires for head looking right
 	wire [7:0] g_s_h_r;
 	wire [7:0] b_s_h_r;
 		
-	wire [7:0] r_s_h_u;
+	wire [7:0] r_s_h_u;//rgb wires for head looking up
 	wire [7:0] g_s_h_u;
 	wire [7:0] b_s_h_u;
 	
@@ -88,11 +88,11 @@ module snake(
 	s_h_r_rom s_h_r (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_r, g_s_h_r, b_s_h_r});	//the rom containing the image of the snake head looking right
 	s_h_u_rom s_h_u (i_clk_74M, i_hcnt[4:0], i_vcnt[4:0], {r_s_h_u, g_s_h_u, b_s_h_u});	//the rom containing the image of the snake head looking up
 	
-	reg [7:0] r_s_h;
+	reg [7:0] r_s_h;//rgb reg for head depending on direction
 	reg [7:0] g_s_h;
 	reg [7:0] b_s_h;
 	
-	always @ (direction) begin
+	always @ (direction) begin//simple logic to assign the value to the above reg depending on the direction.
 		if(direction == 2'b00) begin
 			r_s_h <= r_s_h_r;
 			g_s_h <= g_s_h_r;
@@ -140,20 +140,20 @@ module snake(
 	wire [15:0] rng;
 	PRNG prng_gen (i_clk_74M, rng);
 	
-	reg [5:0] new_x_a = 6'd1;
+	reg [5:0] new_x_a = 6'd1;//the new position the apple is gonna appear after it gets eaten
 	reg [5:0] new_y_a = 6'd1;
 	
-	reg [5:0] temp_x_a = 6'd1;
+	reg [5:0] temp_x_a = 6'd1;//the temp position for searching through the grid for available position
 	reg [5:0] temp_y_a = 6'd1;
 	
-	reg [11:0] c_cnt = 12'd0;
+	reg [11:0] c_cnt = 12'd0;//counting cycles for the apple position part
 	
-	reg available = 1'b1;
+	reg available = 1'b1;//flag to check if a position for the apple is available.
 	
-	reg [8:0] M = 9'd1;
+	reg [8:0] M = 9'd1;//counts how many positions have been approved as available. (plus one)
 	
-	wire [15:0] threshold;
-	divisions_lut divider (M, threshold);	
+	wire [15:0] threshold;//the threshold that's used to run the random experiment of random sampling
+	divisions_lut divider (M, threshold);	//
 	
 	wire [7:0] r_0; //(r, g, b) for 0
 	wire [7:0] g_0;
@@ -199,30 +199,29 @@ module snake(
 	
 	always @ (posedge i_clk_74M) begin
 		if(((x_pos[c_cnt] == temp_x_a && y_pos[c_cnt] == temp_y_a) || (x_pos_a == temp_x_a && y_pos_a == temp_y_a)) && score >= c_cnt) begin
-			available <= 1'b0;
+			available <= 1'b0; //if a part of the snake is on the temp position then check this position as not available
 		end
-		if(c_cnt == score + 12'd1) begin
-			c_cnt <= 12'd0;
-			if(available == 1'b1 && rng <= threshold) begin
-				new_x_a <= temp_x_a;
+		if(c_cnt == score + 12'd1) begin //if the counter has reached the length of our snake plus one then
+			c_cnt <= 12'd0;//reset the counter
+			if(available == 1'b1 && rng <= threshold) begin //if at the end of the cycles this position is still available and the random experiment holds true
+				new_x_a <= temp_x_a; //assign the temp position as the new position
 				new_y_a <= temp_y_a;
+				M <= M + 9'd1; //increasing the counter of approved positions
 			end
-			available <= 1'b1;
-			if(temp_x_a == 6'd13) begin
+			available <= 1'b1; //in any case reset the available flag
+			if(temp_x_a == 6'd13) begin//looping through the positions on the grid.
 				temp_x_a <= 6'd1;
 				if(temp_y_a == 6'd13) begin
 					temp_y_a <= 6'd1;
-					M <= 9'd1;
+					M <= 9'd1;//reseting approved positions after a full 13*13 loop
 				end else begin
-					temp_y_a <= temp_y_a + 6'd1;
-					M <= M + 9'd1;
+					temp_y_a <= temp_y_a + 6'd1; //increasing temp y
 				end
 			end else begin
-				temp_x_a <= temp_x_a + 6'd1;
-				M <= M + 9'd1;
+				temp_x_a <= temp_x_a + 6'd1; //increasing temp x
 			end			
 		end else begin
-			c_cnt <= c_cnt + 12'd1;
+			c_cnt <= c_cnt + 12'd1; //increasing loop counter
 		end		
 	end
 	
@@ -232,19 +231,19 @@ module snake(
 	
 	bin2bcd bin2bcd_converter (score,ONES,TENS,HUNDRENDS);
 	
-	reg [7:0] r_c_0;
+	reg [7:0] r_c_0; //color for first digit of score
 	reg [7:0] g_c_0;
 	reg [7:0] b_c_0;
 	
-	reg [7:0] r_c_1;
+	reg [7:0] r_c_1; //second digit
 	reg [7:0] g_c_1;
 	reg [7:0] b_c_1;
 	
-	reg [7:0] r_c_2;
+	reg [7:0] r_c_2; //third digit
 	reg [7:0] g_c_2;
 	reg [7:0] b_c_2;
 	
-	always @ (ONES) begin
+	always @ (ONES) begin //assign color depending on the number
 		if(ONES == 4'b0000) begin
 			r_c_0 <= r_0;
 			g_c_0 <= g_0;
@@ -292,7 +291,7 @@ module snake(
 		end
 	end
 	
-	always @ (TENS) begin
+	always @ (TENS) begin//assign color depending on the number
 		if(TENS == 4'b0000) begin
 			r_c_1 <= r_0;
 			g_c_1 <= g_0;
@@ -340,7 +339,7 @@ module snake(
 		end
 	end
 	
-	always @ (HUNDRENDS) begin
+	always @ (HUNDRENDS) begin//assign color depending on the number
 		if(HUNDRENDS == 2'b00) begin
 			r_c_2 <= r_0;
 			g_c_2 <= g_0;
@@ -353,35 +352,7 @@ module snake(
 			r_c_2 <= r_2;
 			g_c_2 <= g_2;
 			b_c_2 <= b_2;
-		end /*else if(HUNDRENDS == 2'b0011) begin
-			r_c_2 <= r_3;
-			g_c_2 <= g_3;
-			b_c_2 <= b_3;
-		end else if(HUNDRENDS == 2'b0100) begin
-			r_c_2 <= r_4;
-			g_c_2 <= g_4;
-			b_c_2 <= b_4;
-		end else if(HUNDRENDS == 2'b0101) begin
-			r_c_2 <= r_5;
-			g_c_2 <= g_5;
-			b_c_2 <= b_5;
-		end else if(HUNDRENDS == 2'b0110) begin
-			r_c_2 <= r_6;
-			g_c_2 <= g_6;
-			b_c_2 <= b_6;
-		end else if(HUNDRENDS == 2'b0111) begin
-			r_c_2 <= r_7;
-			g_c_2 <= g_7;
-			b_c_2 <= b_7;
-		end else if(HUNDRENDS == 2'b1000) begin
-			r_c_2 <= r_8;
-			g_c_2 <= g_8;
-			b_c_2 <= b_8;
-		end else if(HUNDRENDS == 2'b1001) begin
-			r_c_2 <= r_9;
-			g_c_2 <= g_9;
-			b_c_2 <= b_9;
-		end */else begin
+		end else begin
 			r_c_2 <= r_0;
 			g_c_2 <= g_0;
 			b_c_2 <= b_0;
@@ -400,7 +371,7 @@ module snake(
 				end
 				if(x_pos[0] + 1 == x_pos_a && y_pos[0] == y_pos_a) begin //if the position we are going to move to is occupied by an apple increase our score
 					score <= score + 1;
-					x_pos_a <= new_x_a;
+					x_pos_a <= new_x_a; //assign new position to apple
 					y_pos_a <= new_y_a;
 				end
 			end else if(direction == 2'b01) begin //same logic as above for left movement
@@ -411,7 +382,7 @@ module snake(
 				end
 				if(x_pos[0] - 1 == x_pos_a && y_pos[0] == y_pos_a) begin
 					score <= score + 1;
-					x_pos_a <= new_x_a;
+					x_pos_a <= new_x_a; 
 					y_pos_a <= new_y_a;
 				end
 			end else if(direction == 2'b11) begin //same logic as above for down movement
@@ -475,7 +446,7 @@ module snake(
 			o_g <= g_b;
 			o_b <= b_b;
 		end else if(x_pos[0] == i_hcnt[10:5] && y_pos[0] == i_vcnt[10:5] && score >= 0) begin //big else if statement to check all the snake parts to draw them. Go to the bottom for the apple.
-			if(bitten == 1'b0) begin
+			if(bitten == 1'b0) begin //swapping the colors if the snake has bit its tail.
 				 o_r <= r_s_h;
 				 o_g <= g_s_h;
 				 o_b <= b_s_h;

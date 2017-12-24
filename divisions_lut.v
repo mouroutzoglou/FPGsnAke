@@ -24,7 +24,7 @@ module divisions_lut(
     );
 
 	always @ * begin
-		case (M)
+		case (M) //returns result of division of 2^16-1 with the given divider M
 					9'b000000001: out = 16'b1111111111111111;
 					9'b000000010: out = 16'b0111111111111111;
 					9'b000000011: out = 16'b0101010101010101;
